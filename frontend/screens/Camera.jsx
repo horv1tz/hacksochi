@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { View, Button, Image } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import { Camera } from 'expo-camera';
 import axios from 'axios';
 
-const Camera = () => {
+const CameraScreen = () => {
+    const [hasPermission, setHasPermission] = useState(null);
     const [photoUri, setPhotoUri] = useState(null);
+    const cameraRef = useRef(null);
 
-    const takePicture = async (camera) => {
-        if (camera) {
-            const options = { quality: 0.5, base64: true };
-            const data = await camera.takePictureAsync(options);
-            setPhotoUri(data.uri);
+
+
+    const takePicture = async () => {
+        if (cameraRef.current) {
+            const { status } = await Camera.requestPermissionsAsync();
+            if (status === 'granted') {
+                const photo = await cameraRef.current.takePictureAsync({ quality: 0.5 });
+                setPhotoUri(photo.uri);
+            } else {
+                console.log('Permission to access camera was denied');
+            }
         }
     };
 
@@ -40,25 +48,21 @@ const Camera = () => {
 
     return (
         <View style={{ flex: 1 }}>
-            <RNCamera
+            <Camera
+                ref={cameraRef}
                 style={{ flex: 1 }}
-                type={RNCamera.Constants.Type.back}
-                flashMode={RNCamera.Constants.FlashMode.off}
-                captureAudio={false}
+                type={Camera.Constants.Type.back}
+                flashMode={Camera.Constants.FlashMode.off}
+                onCameraReady={() => setHasPermission(true)}
             >
-                {({ camera, status, recordAudioPermissionStatus }) => {
-                    if (status !== 'READY') return <View />;
-                    return (
-                        <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                            <Button title="Take Picture" onPress={() => takePicture(camera)} />
-                            <Button title="Upload" onPress={uploadPhoto} disabled={!photoUri} />
-                        </View>
-                    );
-                }}
-            </RNCamera>
+                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center',position: 'absolute',  bottom: 0,width: '100px'}}>
+                    <Button title="📷" onPress={takePicture} disabled={!hasPermission} />
+                    <Button title="⬆️" onPress={uploadPhoto} disabled={!photoUri} />
+                </View>
+            </Camera>
             {photoUri && <Image source={{ uri: photoUri }} style={{ flex: 1 }} />}
         </View>
     );
 };
 
-export default Camera;
+export default CameraScreen;
