@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, Date, Numeric, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
+from database import engine
 
 Base = declarative_base()
 
@@ -24,7 +25,7 @@ class Shop(Base):
     adress = Column(String(50), nullable=False)
     longitude = Column(Numeric, nullable=False)
     latitude = Column(Numeric, nullable=False)
-    admintasks = relationship("Admintasks", back_populates="shop")
+    admintasks = relationship("Adminstasks", back_populates="shop")
 
 
 class Product(Base):
@@ -33,6 +34,7 @@ class Product(Base):
     name = Column(String(50), nullable=False)
     cost = Column(Integer, nullable=False)
     measure = Column(Integer, nullable=False)
+    admintasks = relationship("Adminstasks", back_populates="product")
 
 
 class Admin(Base):
@@ -46,6 +48,7 @@ class Admin(Base):
     password = Column(String(50), nullable=False)
     is_active = Column(Boolean, nullable=False)
     id_telegram = Column(Integer, nullable=False)
+    admintasks = relationship("Adminstasks", back_populates="admin")
 
 
 class AdminsTask(Base):
@@ -59,4 +62,9 @@ class AdminsTask(Base):
     id_admin = Column(Integer, ForeignKey('admins.id_admin'), nullable=False)
     id_product = Column(Integer, ForeignKey('product.id_product'), nullable=False)
     id_users = Column(Integer, ForeignKey('users.id_users'), nullable=False)
-    orders = relationship("Shops", back_populates="admintasks")
+    orders = relationship("Shops", back_populates="adminstasks")
+    product = relationship("Product", back_populates="adminstasks")
+    admin = relationship("Admin", back_populates="adminstasks")
+    user = relationship("User", back_populates="adminstasks")
+
+Base.metadata.create_all(engine)
