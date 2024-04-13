@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import HTMLResponse
 from uuid import uuid4
 import os
 from aiogram import Bot, types
@@ -23,13 +24,26 @@ async def send_message(chat_id: int):
     confirmation_state[unique_id] = False
     return {"message": "Message sent with confirmation link", "unique_id": unique_id}
 
-@router.get("/confirm/{unique_id}")
+@router.get("/confirm/{unique_id}", response_class=HTMLResponse)
 async def confirm(unique_id: str):
-    if unique_id in confirmation_state:
+    if unique_id in confirmation_state and confirmation_state[unique_id] is False:
         confirmation_state[unique_id] = True
-        return {"status": "Confirmed"}
+        html_content = """
+        <html>
+            <head>
+                <title>Confirmation</title>
+            </head>
+            <body>
+                <script>
+                    window.close();
+                </script>
+            </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content)
     else:
         raise HTTPException(status_code=404, detail="Invalid or expired unique ID")
+
 
 @router.get("/status/{unique_id}")
 async def check_status(unique_id: str):
