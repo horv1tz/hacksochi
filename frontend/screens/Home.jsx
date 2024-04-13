@@ -15,6 +15,10 @@ export default function Home({ navigation }) {
                 onPress={() => navigation.navigate('Загрузить изображение')}
                 style={styles.button}
             />
+            <Button
+                title="Admin"
+                onPress={() => navigation.navigate('Админ-панель')}
+                style={styles.button}/>
         </View>
     );
 }
