@@ -1,10 +1,9 @@
 from main import app
-from fastapi import FastAPI, HTTPException, status
+from fastapi import  HTTPException, status
 from fastapi.responses import JSONResponse
 from telebot import TeleBot, types
 from uuid import uuid4
 
-app = FastAPI()
 TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
 bot = TeleBot(TOKEN, parse_mode="HTML")
 
