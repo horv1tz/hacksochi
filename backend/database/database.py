@@ -2,12 +2,13 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
-import os 
+import os
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+
 
 # Функция для проверки подключения базы данных
 async def test_connection_to_db():

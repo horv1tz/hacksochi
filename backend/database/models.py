@@ -3,6 +3,7 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'users'
     id_users = Column(Integer, primary_key=True)
@@ -16,6 +17,7 @@ class User(Base):
     id_telegram = Column(Integer, nullable=False)
     jwt = Column(String, nullable=False)
 
+
 class Shop(Base):
     __tablename__ = 'shops'
     id_shop = Column(Integer, primary_key=True)
@@ -24,12 +26,14 @@ class Shop(Base):
     longitude = Column(Numeric, nullable=False)
     latitude = Column(Numeric, nullable=False)
 
+
 class Product(Base):
     __tablename__ = 'product'
     id_product = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     cost = Column(Integer, nullable=False)
     measure = Column(String(50), nullable=False)
+
 
 class Admin(Base):
     __tablename__ = 'admins'
@@ -43,6 +47,7 @@ class Admin(Base):
     is_deleted = Column(Boolean, nullable=False)
     id_telegram = Column(Integer, nullable=False)
     jwt = Column(String, nullable=False)
+
 
 class AdminsTask(Base):
     __tablename__ = 'adminstasks'

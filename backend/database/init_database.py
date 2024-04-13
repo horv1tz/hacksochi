@@ -4,10 +4,12 @@ from sqlalchemy.future import select
 from .database import SessionLocal, engine
 from .models import Base  # Предполагается, что Base - это declarative base из файла models.py
 
+
 async def create_tables():
     async with engine.begin() as conn:
         # Создание всех таблиц, определенных в Base.metadata
         await conn.run_sync(Base.metadata.create_all)
+
 
 async def check_and_create_tables():
     # Создание сессии

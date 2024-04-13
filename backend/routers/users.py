@@ -11,6 +11,7 @@ bot = Bot(token=TOKEN)
 
 confirmation_state = {}
 
+
 @router.post("/send_message/{chat_id}")
 async def send_message(chat_id: int):
     unique_id = str(uuid4())
@@ -23,6 +24,7 @@ async def send_message(chat_id: int):
     await bot.send_message(chat_id, text=message_text, reply_markup=keyboard)
     confirmation_state[unique_id] = False
     return {"message": "Message sent with confirmation link", "unique_id": unique_id}
+
 
 @router.get("/confirm/{unique_id}", response_class=HTMLResponse)
 async def confirm(unique_id: str):
