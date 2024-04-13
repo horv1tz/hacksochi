@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db/postgres
+    networks:
+      - webnet
+    ports:
+      - "3000:80"  # Порт 3000 локально будет проксироваться на 80 порт в контейнере
+
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - webnet
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - webnet
+    ports:
+      - "8080:8080"
+
+networks:
+  webnet:
+
+volumes:
+  db-data:
