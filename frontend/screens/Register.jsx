@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-const Registration = () => {
+const Registration = ({navigation}) => {
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
@@ -48,7 +48,7 @@ const Registration = () => {
                 secureTextEntry
                 placeholder="Введите пароль"
             />
-            <Button title="Зарегистрироваться" onPress={handleRegistration} />
+            <Button title="Зарегистрироваться"  onPress={() => navigation.navigate('Выбор магазина')}/>
         </View>
     );
 };
