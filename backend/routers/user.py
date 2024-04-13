@@ -1,10 +1,11 @@
 from main import app
-from fastapi import  HTTPException, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
 from telebot import TeleBot, types
 from uuid import uuid4
 
-TOKEN = "6760804703:AAFYfy6e9igSPFGNSdjsZZDwRYRxGfFiGs8"
+app = FastAPI()
+TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
 bot = TeleBot(TOKEN, parse_mode="HTML")
 
 # In-memory dictionary to keep track of the confirmation state
@@ -16,24 +17,19 @@ def button_callback_handler(call):
     confirmation_state[unique_id] = True
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Подтверждение получено!")
     bot.answer_callback_query(call.id)
-    print(confirmation_state)
 
-@app.get("/send_message/{chat_id}")
+@app.post("/send_message/{chat_id}")
 async def send_message(chat_id: int):
     try:
         unique_id = str(uuid4())
-        keyboard = types.KeyboardMarkup()
-        button = types.KeyboardButton(text="Подтвердить", callback_data=f'confirm:{unique_id}')
+        keyboard = types.InlineKeyboardMarkup()
+        button = types.InlineKeyboardButton(text="Подтвердить", callback_data=f'confirm:{unique_id}')
         keyboard.add(button)
         bot.send_message(chat_id, 'Нажмите кнопку для подтверждения', reply_markup=keyboard)
         confirmation_state[unique_id] = False
         return {"message": "Message sent, waiting for user confirmation", "unique_id": unique_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-@app.get('/change_status/{unique_id}')
-async def change_status(unique_id: str):
-    pass
 
 @app.get("/check_confirmation/{unique_id}")
 async def check_confirmation(unique_id: str):
