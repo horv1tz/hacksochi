@@ -15,7 +15,7 @@ class User(BaseModel):
 
 class UserOutput(BaseModel):
     id: int
-    id_telegram: int
+    id_telegram: int | None = None
     surname: str
     name: str
     phone: str
