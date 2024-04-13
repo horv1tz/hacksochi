@@ -11,7 +11,7 @@ services:
     networks:
       - webnet
     ports:
-      - "8000:80"  # Порт 8000 локально будет проксироваться на 80 порт в контейнере
+      - "3000:80"  # Порт 3000 локально будет проксироваться на 80 порт в контейнере
 
   db:
     image: postgres:13
@@ -32,18 +32,6 @@ services:
       - webnet
     ports:
       - "8080:8080"
-
-  nginx:
-    image: nginx:alpine
-    restart: always
-    depends_on:
-      - web
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-    networks:
-      - webnet
 
 networks:
   webnet:
