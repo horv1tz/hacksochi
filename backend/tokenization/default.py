@@ -66,10 +66,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Получаем данные пользователя из Redis
     user_info = redis_client.hgetall(email)
     if not user_info:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    # Возвращаем данные пользователя
     return user_info
