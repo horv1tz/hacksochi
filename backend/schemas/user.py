@@ -11,3 +11,14 @@ class User(BaseModel):
     phone_verified: bool | None = False
     email: str
     password: str
+
+
+class UserOutput(BaseModel):
+    id: int
+    id_telegram: int
+    surname: str
+    name: str
+    phone: str
+    email_verified: bool
+    phone_verified: bool
+    email: str
