@@ -3,7 +3,7 @@ import { View, Button, Image, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
-const UploadImages = () => {
+const UploadImages = ({navigation}) => {
     const [selectedImage, setSelectedImage] = useState(null);
 
     const pickImage = async () => {
@@ -51,7 +51,7 @@ const UploadImages = () => {
                 <Image source={{ uri: selectedImage }} style={styles.image} />
             )}
             <Button  title="Выберите изображение из галереи" onPress={pickImage} style={styles.button} />
-            <Button title="Загрузить" onPress={uploadImage} style={styles.button} />
+            <Button title="Загрузить" onPress={() => navigation.navigate('Статус')} style={styles.button} />
         </View>
     );
 };
@@ -70,7 +70,9 @@ const styles = StyleSheet.create({
     },
     button: {
         marginVertical: 10,
-    }
+        borderRadius: 10,
+        backgroundColor: '#007bff',
+    },
 });
 
 export default UploadImages;
