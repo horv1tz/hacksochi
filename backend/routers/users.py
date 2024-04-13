@@ -14,7 +14,7 @@ confirmation_state = {}
 async def send_message(chat_id: int):
     unique_id = str(uuid4())
     # Предполагаем, что ваш сервер доступен по этому адресу
-    confirmation_url = f"https://your-domain.com/confirm/{unique_id}"
+    confirmation_url = f"https://95.139.92.29:8000/confirm/{unique_id}"
     keyboard = types.InlineKeyboardMarkup()
     button = types.InlineKeyboardButton("Подтвердить действие", url=confirmation_url)
     keyboard.add(button)
