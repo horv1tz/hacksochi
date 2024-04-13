@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from schemas.user import UserRegistration
 from tokenization.default import Token, hash_password, redis_client, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user
 from schemas.user import User
+from database.database import UserCrud
 
 router = APIRouter()
 TOKEN = "6760804703:AAFYfy6e9igSPFGNSdjsZZDwRYRxGfFiGs8"
@@ -71,13 +72,18 @@ async def register_user(user_data: UserRegistration):
     }
 
     # В реальном приложении здесь будет код для сохранения пользователя в базе данных
-    # В данном примере мы сохраняем данные пользователя в Redis
-    redis_client.set(user_data.email, user_info)
+    try:
+        await UserCrud().create_user(user_info)
+        # В данном примере мы сохраняем данные пользователя в Redis
+        redis_client.set(user_data.email, user_info)
 
-    # Создаем JWT токен для пользователя и возвращаем его клиенту
-    access_token = create_access_token(data={"sub": user_data.email},
-                                       expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    return {"access_token": access_token, "token_type": "bearer"}
+        # Создаем JWT токен для пользователя и возвращаем его клиенту
+        access_token = create_access_token(data={"sub": user_data.email},
+                                           expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+        return {"access_token": access_token, "token_type": "bearer"}
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}
 
 
 @router.get("/users/me", response_model=User)
