@@ -3,6 +3,9 @@ from fastapi.responses import HTMLResponse
 from uuid import uuid4
 import os
 from aiogram import Bot, types
+from datetime import datetime, timedelta
+from schemas.user import UserRegistration
+from tokenization.default import Token, hash_password, redis_client, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
 
@@ -49,3 +52,29 @@ async def check_status(unique_id: str):
         return {"status": status}
     else:
         raise HTTPException(status_code=404, detail="Invalid or expired unique ID")
+
+
+@router.post("/register", response_model=Token, tags=["User"])
+async def register_user(user_data: UserRegistration):
+    # В вашем приложении здесь будет логика создания пользователя в базе данных
+
+    # Хешируем пароль перед сохранением в базу данных
+    hashed_password = hash_password(user_data.password)
+
+    # Формируем данные пользователя для сохранения в Redis
+    user_info = {
+        "email": user_data.email,
+        "surname": user_data.surname,
+        "name": user_data.name,
+        "phone": user_data.phone,
+        "hashed_password": hashed_password  # Сохраняем хешированный пароль
+    }
+
+    # В реальном приложении здесь будет код для сохранения пользователя в базе данных
+    # В данном примере мы сохраняем данные пользователя в Redis
+    redis_client.set(user_data.email, user_info)
+
+    # Создаем JWT токен для пользователя и возвращаем его клиенту
+    access_token = create_access_token(data={"sub": user_data.email},
+                                       expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    return {"access_token": access_token, "token_type": "bearer"}
