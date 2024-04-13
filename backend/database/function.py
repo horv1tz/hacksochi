@@ -4,18 +4,18 @@ from .models import *
 # User region ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 async def add_user(surname, name, email, phone, password):
-    session = SessionLocal()  # Создание сессии, предполагается, что Session уже определен, как в предыдущем примере
-    new_user = User(surname=surname, name=name, email=email, phone=phone, password=password)
-    try:
-        session.add(new_user)  # Добавление нового пользователя в сессию
-        session.commit()  # Фиксация изменений в базе данных
-        print(f"Пользователь {name} {surname} успешно добавлен.")
-        return new_user  # Возвращаем объект пользователя после успешного добавления
-    except Exception as e:
-        session.rollback()  # Откат изменений в случае ошибки
-        print(f"Ошибка при добавлении пользователя: {e}")
-    finally:
-        session.close()  # Закрытие сессии
+    async with SessionLocal() as session:  # Создание асинхронной сессии
+        async with session.begin():  # Автоматическое управление транзакцией
+            new_user = User(surname=surname, name=name, email=email, phone=phone, password=password)
+            session.add(new_user)
+        try:
+            await session.commit()  # Асинхронный коммит изменений
+            print(f"Пользователь {name} {surname} успешно добавлен.")
+            return new_user  # Возвращаем объект пользователя после успешного добавления
+        except SQLAlchemyError as e:
+            await session.rollback()  # Асинхронный откат в случае ошибки
+            print(f"Ошибка при добавлении пользователя: {e}")
+            raise  # Повторное возбуждение исключения для внешнего уровня
 
 # Пример использования функции
 # add_user('Иванов', 'Иван', 'ivan@example.com', '89123456789', 'securepassword123')
