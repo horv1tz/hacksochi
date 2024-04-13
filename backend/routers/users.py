@@ -17,8 +17,6 @@ async def send_message(chat_id: int):
     unique_id = str(uuid4())
     # Предполагаем, что ваш сервер доступен по этому адресу
     confirmation_url = f"http://95.139.92.29:8000/confirm/{unique_id}"
-    message_text = "Пожалуйста, подтвердите ваше действие, нажав на кнопку ниже:"
-    await bot.send_message(chat_id, text=message_text, reply_markup=keyboard)
     confirmation_state[unique_id] = False
     return {"message": "Message sent with confirmation link", "unique_id": unique_id}
 
