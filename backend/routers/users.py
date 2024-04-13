@@ -83,7 +83,7 @@ async def register_user(user_data: UserRegistration):
         return {"access_token": access_token, "token_type": "bearer"}
     except Exception as e:
         print(e)
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=e)
 
 
 @router.get("/users/me", response_model=User)
