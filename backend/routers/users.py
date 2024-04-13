@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from uuid import uuid4
 import os
 from aiogram import Bot, types
 from datetime import datetime, timedelta
 from schemas.user import UserRegistration
-from tokenization.default import Token, hash_password, redis_client, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from tokenization.default import Token, hash_password, redis_client, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user
+from schemas.user import User
 
 router = APIRouter()
 TOKEN = "6760804703:AAFYfy6e9igSPFGNSdjsZZDwRYRxGfFiGs8"
@@ -77,3 +78,8 @@ async def register_user(user_data: UserRegistration):
     access_token = create_access_token(data={"sub": user_data.email},
                                        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/users/me", response_model=User)
+async def read_users_me(current_user: dict = Depends(get_current_user)):
+    return current_user

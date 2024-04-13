@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status, Depends
 from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
@@ -14,6 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 class Token(BaseModel):
     access_token: str
@@ -45,3 +47,29 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     redis_client.setex(encoded_jwt, expires_delta.total_seconds(), data['sub'])  # Сохранение токена в Redis
     return encoded_jwt
+
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Получаем данные пользователя из Redis
+    user_info = redis_client.hgetall(email)
+    if not user_info:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Возвращаем данные пользователя
+    return user_info
