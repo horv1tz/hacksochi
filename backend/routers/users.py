@@ -8,7 +8,6 @@ from schemas.user import UserRegistration
 from tokenization.default import Token, hash_password, redis_client, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
-#NEGR
 TOKEN = "6760804703:AAFYfy6e9igSPFGNSdjsZZDwRYRxGfFiGs8"
 bot = Bot(token=TOKEN)
 
