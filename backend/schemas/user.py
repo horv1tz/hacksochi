@@ -22,3 +22,11 @@ class UserOutput(BaseModel):
     email_verified: bool
     phone_verified: bool
     email: str
+
+
+class UserRegistration(BaseModel):
+    email: str
+    surname: str
+    name: str
+    phone: str
+    password: str

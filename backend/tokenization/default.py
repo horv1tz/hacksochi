@@ -5,6 +5,7 @@ import redis
 import json
 import redis
 from datetime import datetime, timedelta
+from pydantic import BaseModel
 
 SECRET_KEY = "your_jwt_secret"
 ALGORITHM = "HS256"
@@ -13,6 +14,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 def hash_password(password: str):
@@ -40,5 +45,3 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     redis_client.setex(encoded_jwt, expires_delta.total_seconds(), data['sub'])  # Сохранение токена в Redis
     return encoded_jwt
-
-
