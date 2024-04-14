@@ -1,0 +1,11 @@
+{
+    "Email": {
+        "login": "noreply@dvorfs.com",
+        "password": "emailNoReply2024"
+    },
+    "SMTP": {
+        "server": "smtp.timeweb.ru",
+        "port": "465"
+    },
+    "DATABASE": ""
+}
