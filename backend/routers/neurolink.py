@@ -13,27 +13,30 @@ def load_data(filepath):
     # Загружаем данные из Excel файла
     return pd.read_excel(filepath)
 
-def find_similar_words(base_word, words, threshold=50):
+def find_similar_words(base_word, words, threshold=40):
     similar_words = process.extract(base_word, words, limit=10, scorer=fuzz.token_sort_ratio)
     return [word for word, score in similar_words if score >= threshold]
 
 @router.post("/check_photo", tags=['Нейросеть'], response_model=dict)
 async def check_photo(photo: Photo):
     df = load_data('data/price.xlsx')  # Укажите здесь путь к вашему Excel файлу
-    product_names = df['Название'].tolist()  # Замените 'Название' на название соответствующей колонки в вашем файлеa
+    product_names = df['Наименование товара'].tolist()  # Замените 'Название' на название соответствующей колонки в вашем файлеa
 
     similar_words = find_similar_words(photo.title, product_names)
     results = []
     
     for word in similar_words:
-        matched_data = df[df['Название'] == word]  # Замените 'Название' на название соответствующей колонки в вашем файле
+        matched_data = df[df['Наименование товара'] == word]  # Замените 'Название' на название соответствующей колонки в вашем файле
         for _, row in matched_data.iterrows():
             results.append({
-                "Название": row['Название'],  # Название продукта
+                "Название": row['Наименование товара'],  # Название продукта
                 "Цена": row['Цена'],  # Цена продукта
-                "Категория": row['Категория']  # Категория продукта
+                # "Категория": row['Категория']  # Категория продукта
             })
     
-    return {"message": results}
+    if results == []:
+        return { "status": 1 }
+    else:
+        pass
 
-print(load_data('./data/price.xlsx'))
+# print(load_data('./data/price.xlsx'))
