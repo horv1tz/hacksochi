@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Button, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, Button, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 
 const Admin = () => {
     const [tasks, setTasks] = useState([
@@ -61,20 +61,21 @@ const Admin = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <FlatList
                 data={tasks}
                 renderItem={renderTaskItem}
                 keyExtractor={item => item.id.toString()}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
             />
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        marginTop: StatusBar.currentHeight || 0,
     },
     header: {
         fontSize: 24,
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
     },
     taskContainer: {
         marginBottom: 20,
+        paddingHorizontal: 20,
     },
     taskName: {
         fontSize: 18,
@@ -101,11 +103,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'blue',
         padding: 10,
         borderRadius: 5,
+        alignSelf: 'flex-start',
     },
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
+    },
+    separator: {
+        height: 1,
+        backgroundColor: '#ccc',
+        marginVertical: 10,
     },
 });
 

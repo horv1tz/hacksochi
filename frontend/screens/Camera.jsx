@@ -1,27 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Button, Image, Platform } from 'react-native'; // Импорт Platform из react-native
+import { View, Button, Image, Platform, StyleSheet } from 'react-native';
 import { Camera } from 'expo-camera';
 import axios from 'axios';
 
-const CameraScreen = ({navigation}) => {
+const CameraScreen = ({ navigation }) => {
     const [hasPermission, setHasPermission] = useState(null);
     const [photoUri, setPhotoUri] = useState(null);
     const cameraRef = useRef(null);
 
     useEffect(() => {
         (async () => {
-            if (Platform.OS === 'android') {
-                const { status } = await Camera.requestPermissionsAsync(); // Используем Camera.requestPermissionsAsync() для Android
-                setHasPermission(status === 'granted');
-            } else {
-                const { status } = await Camera.requestPermissionsAsync(); // Используем Camera.requestPermissionsAsync() для iOS
-                setHasPermission(status === 'granted');
-            }
+            const { status } = await Camera.requestPermissionsAsync();
+            setHasPermission(status === 'granted');
         })();
     }, []);
 
     const takePicture = async () => {
-        if (cameraRef.current && hasPermission) { // Проверяем разрешение перед вызовом takePictureAsync
+        if (cameraRef.current && hasPermission) {
             const photo = await cameraRef.current.takePictureAsync({ quality: 0.5 });
             setPhotoUri(photo.uri);
         } else {
@@ -30,7 +25,6 @@ const CameraScreen = ({navigation}) => {
     };
 
     const uploadPhoto = async () => {
-
         if (photoUri) {
             const formData = new FormData();
             formData.append('photo', {
@@ -53,23 +47,43 @@ const CameraScreen = ({navigation}) => {
     };
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={styles.container}>
             <Camera
                 ref={cameraRef}
-                style={{ flex: 1 }}
+                style={styles.camera}
                 type={Camera.Constants.Type.back}
                 flashMode={Camera.Constants.FlashMode.off}
                 onCameraReady={() => setHasPermission(true)}
             >
-                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center', position: 'absolute', bottom: 0, width: '100px' }}>
+                <View style={styles.buttonContainer}>
                     <Button title="📷" onPress={takePicture} disabled={!hasPermission} />
                     <Button title="⬆️" onPress={uploadPhoto} disabled={!photoUri} />
                     <Button title="Продолжить" onPress={() => navigation.navigate('Статус')} />
                 </View>
             </Camera>
-            {photoUri && <Image source={{ uri: photoUri }} style={{ flex: 1 }} />}
+            {photoUri && <Image source={{ uri: photoUri }} style={styles.imagePreview} />}
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 0,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+    },
+    imagePreview: {
+        flex: 1,
+    },
+});
 
 export default CameraScreen;
