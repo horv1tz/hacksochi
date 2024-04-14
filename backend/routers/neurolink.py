@@ -17,7 +17,7 @@ def find_similar_words(base_word, words, threshold=40):
     similar_words = process.extract(base_word, words, limit=10, scorer=fuzz.token_sort_ratio)
     return [word for word, score in similar_words if score >= threshold]
 
-@router.post("/check_photo", tags=['Нейросеть'], response_model=dict)
+@router.post("/check_photo/", tags=['Нейросеть'], response_model=dict)
 async def check_photo(photo: Photo):
     df = load_data('data/price.xlsx')  # Укажите здесь путь к вашему Excel файлу
     product_names = df['Наименование товара'].tolist()  # Замените 'Название' на название соответствующей колонки в вашем файлеa
