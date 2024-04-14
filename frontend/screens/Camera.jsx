@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Button, Image, Platform, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Camera } from 'expo-camera';
 import axios from 'axios';
 
@@ -24,25 +25,33 @@ const CameraScreen = ({ navigation }) => {
         }
     };
 
+    const saveDataToAsyncStorage = async (data) => {
+        try {
+            const existingData = await AsyncStorage.getItem('data');
+            const tasks = existingData ? JSON.parse(existingData) : [];
+            const newData = [...tasks, data];
+            await AsyncStorage.setItem('data', JSON.stringify(newData));
+            console.log('Data saved successfully');
+        } catch (error) {
+            console.error('Error saving data:', error);
+        }
+    };
+
     const uploadPhoto = async () => {
         if (photoUri) {
-            const formData = new FormData();
-            formData.append('photo', {
-                uri: photoUri,
-                type: 'image/jpeg',
-                name: 'photo.jpg',
-            });
+            const id = Math.random().toString(36).substr(2, 9); // Генерация случайного id
+            const currentDate = new Date().toISOString().slice(0, 10); // Получение текущей даты в формате YYYY-MM-DD
+            const data = {
+                id: id,
+                createdAt: currentDate,
+                name: 'Несоответствие цены',
+                storeName: 'Магнит',
+                image: photoUri,
+                status: 1,
+            };
 
-            try {
-                const response = await axios.post('YOUR_SERVER_ENDPOINT', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-            } catch (error) {
-                console.error('Upload failed:', error);
-                // Добавьте здесь код для обработки ошибки загрузки
-            }
+            // Сохранение данных в AsyncStorage
+            await saveDataToAsyncStorage(data);
         }
     };
 

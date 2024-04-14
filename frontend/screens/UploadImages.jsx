@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Button, Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
-import axios from 'axios';
 
-const UploadImages = ({navigation}) => {
+const UploadImages = ({ navigation }) => {
     const [selectedImage, setSelectedImage] = useState(null);
+
+    useEffect(() => {
+        // Здесь можно добавить логику для чтения массива из AsyncStorage при загрузке компонента, если это необходимо
+    }, []);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -19,29 +23,28 @@ const UploadImages = ({navigation}) => {
     };
 
     const uploadImage = async () => {
+        const jsonContent = {
+            id: 1,
+            createdAt: '2024-04-13',
+            name: 'Несоответствие цены',
+            storeName: 'Магнит',
+            image: selectedImage,
+            status: 1,
+        };
+
         try {
-            if (selectedImage) {
-                const formData = new FormData();
-                formData.append('image', {
-                    uri: selectedImage,
-                    name: 'image.jpg',
-                    type: 'image/jpg',
-                });
+            // Получение текущего массива из AsyncStorage
+            let existingData = await AsyncStorage.getItem('data');
+            existingData = existingData ? JSON.parse(existingData) : [];
 
-                const response = await axios.post('YOUR_SERVER_ENDPOINT', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
+            // Добавление нового объекта в массив
+            existingData.push(jsonContent);
 
-                console.log('Image uploaded successfully:', response.data);
-                // Handle success or navigate to next screen
-            } else {
-                console.log('No image selected.');
-            }
+            // Сохранение обновленного массива в AsyncStorage
+            await AsyncStorage.setItem('data', JSON.stringify(existingData));
+            console.log('Data saved successfully');
         } catch (error) {
-            console.error('Error uploading image:', error);
-            // Handle error
+            console.log('Error saving data: ', error);
         }
     };
 
@@ -50,8 +53,8 @@ const UploadImages = ({navigation}) => {
             {selectedImage && (
                 <Image source={{ uri: selectedImage }} style={styles.image} />
             )}
-            <Button  title="Выберите изображение из галереи" onPress={pickImage} style={styles.button} />
-            <Button title="Загрузить" onPress={() => navigation.navigate('Статус')} style={styles.button} />
+            <Button title="Выберите изображение из галереи" onPress={pickImage} style={styles.button} />
+            <Button title="Загрузить" onPress={uploadImage} style={styles.button} />
         </View>
     );
 };

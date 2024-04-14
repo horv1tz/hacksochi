@@ -1,38 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, Image, Button, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, ScrollView } from 'react-native';
-
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, Button, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, ScrollView  } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const Admin = () => {
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            createdAt: '2024-04-13',
-            name: 'Несоответствие цены',
-            storeName: 'Магнит',
-            image: 'https://sun9-30.userapi.com/impg/OWf3Nmw--Pci9ivkh5owCqtdu-Gocv2bNzN3Mg/_6L3t_Lh3Ok.jpg?size=960x1280&quality=96&sign=b9406615117e55190dffe728d5d190d3&type=album',
-            status: 1,
-        },
-        {
-            id: 2,
-            createdAt: '2024-04-12',
-            name: 'Несоответствие цены',
-            storeName: 'Пятерочка',
-            image: 'https://sun9-35.userapi.com/impg/g02pjN7jd7dU9-6fBgB5veWzR8uy1unNOlqfCA/U6-SUZ-7_SM.jpg?size=960x1280&quality=96&sign=eed8c29b4ba415deeccb9553522a6ef7&type=album',
-            status: 1,
-        },
-        {
-            id: 3,
-            createdAt: '2024-04-11',
-            name: 'Несоответствие цены',
-            storeName: 'Магнит',
-            image: 'https://sun1-85.userapi.com/impg/kghrnUy4WlRzuXQgpYa4ptSuP2zmVTxA_dhAew/v3fxzqeiQ1g.jpg?size=960x1280&quality=96&sign=7ffc54e7eaf65a741f8741d372fdc721&type=album',
-            status: 1,
-        },
-    ]);
+    const [tasks, setTasks] = useState([]);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                const jsonValue = await AsyncStorage.getItem('data');
+                if (jsonValue !== null) {
+                    const parsedData = JSON.parse(jsonValue);
+                    setTasks([parsedData]); // Преобразование объекта в массив для использования в FlatList
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        };
+
+        fetchTasks();
+    }, []);
 
     const handleChangeStatus = (taskId) => {
         const updatedTasks = tasks.map(task => {
             if (task.id === taskId) {
-                return { ...task, status: task.status === 1 ? 0 : 1 }; // Переключаем статус
+                return { ...task, status: task.status === 1 ? 0 : 1 };
             }
             return task;
         });
@@ -41,7 +32,7 @@ const Admin = () => {
 
     const renderTaskItem = ({ item }) => {
         if (item.status === 0) {
-            return null; // Не отображать задачу, если статус равен нулю
+            return null;
         }
 
         return (
@@ -76,11 +67,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: StatusBar.currentHeight || 0,
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
     },
     taskContainer: {
         marginBottom: 20,
